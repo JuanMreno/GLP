@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">GLP</string>
+
+    <string name="db_name">AppDb</string>
+    <integer name="db_version">1</integer>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="txt_app_title">Gestión Cilindros GLP</string>
+    <string name="txt_usuario">Usuario</string>
+    <string name="btn_ingresar">Ingresar</string>
+    <string name="btn_registrarse">Registro</string>
+    <string name="txt_vehículo_o_plataforma">Vehículo ó Plataforma</string>
+
+    <string name="hint_vehi_base">Vehículo o Base</string>
+    <string name="hint_nombre">Nombre Operario</string>
+    <string name="hint_identificacion">Identificación</string>
+    <string name="hint_telefono">Teléfono</string>
+
+    <string name="txt_dialog_title_registro">Registrarse</string>
+    <string name="txt_dialog_aceptar">Aceptar</string>
+    <string name="txt_dialog_cancelar">Cancelar</string>
+
+    <string name="txt_input_error_empty">Campo requerido.</string>
+
+
+    <string-array name="usuarios_tipo_array">
+        <item>Vehículo</item>
+        <item>Plataforma</item>
+    </string-array>
+</resources>
