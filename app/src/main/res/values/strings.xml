@@ -2,20 +2,44 @@
     <string name="app_name">GLP</string>
 
     <string name="db_name">AppDb</string>
-    <integer name="db_version">1</integer>
+    <integer name="db_version">4</integer>
 
     <string name="action_settings">Settings</string>
+    <string name="action_cerrar_sesion">Cerrar sesión</string>
+    <string name="action_generar_reporte">Generar reporte</string>
+
+    <string name="txt_vehiculo">Vehículo</string>
+    <string name="txt_plataforma">Plataforma</string>
 
     <string name="txt_app_title">Gestión Cilindros GLP</string>
     <string name="txt_usuario">Usuario</string>
     <string name="btn_ingresar">Ingresar</string>
     <string name="btn_registrarse">Registro</string>
+    <string name="btn_guardar">Guardar</string>
+    <string name="btn_guardar_agregar">Guardar y agregar</string>
     <string name="txt_vehículo_o_plataforma">Vehículo ó Plataforma</string>
 
+    <!-- HINTS                  -->
     <string name="hint_vehi_base">Vehículo o Base</string>
     <string name="hint_nombre">Nombre Operario</string>
     <string name="hint_identificacion">Identificación</string>
     <string name="hint_telefono">Teléfono</string>
+
+    <string name="hint_fecha">Fecha</string>
+    <string name="hint_hora">Hora</string>
+    <string name="hint_nombre_cliente">Nombre de cliente</string>
+    <string name="hint_direccion">Dirección</string>
+    <string name="hint_recarga_n">Recarga Nº</string>
+    <string name="hint_valor">Valor ($)</string>
+    <string name="hint_tara">Tara (Kg)</string>
+    <string name="hint_peso_real">Peso Real (Kg)</string>
+    <string name="hint_error">Error</string>
+    <string name="hint_estado_cil_rec">Estado Cil. Recibido</string>
+
+
+    <string name="txt_ciudad">Ciudad</string>
+    <string name="txt_cap_cil_rec">Cap. Cilindro Rec. (KG)</string>
+    <string name="txt_cap_cil_ent">Cap. Cilindro Ent. (KG)</string>
 
     <string name="txt_dialog_title_registro">Registrarse</string>
     <string name="txt_dialog_aceptar">Aceptar</string>
@@ -23,9 +47,43 @@
 
     <string name="txt_input_error_empty">Campo requerido.</string>
 
+    <string name="txt_cil_entregado_photo">Cilindro entregado</string>
+    <string name="txt_cil_recibido_photo">Cilindro recibido</string>
+
+    <string name="txt_tlt_suario_no_registrado">Usuario no registrado</string>
+
+    <string name="txt_toast_campos_req">Todos los campos son requeridos.</string>
+    <string name="txt_mns_reg_exito">Registro generado con éxito.</string>
 
     <string-array name="usuarios_tipo_array">
         <item>Vehículo</item>
         <item>Plataforma</item>
     </string-array>
+
+    <string-array name="ciudades_array">
+        <item>Pereira</item>
+        <item>Dosquebradas</item>
+        <item>La Virginia</item>
+        <item>Santa Rosa</item>
+        <item>Marsella</item>
+        <item>Santuario</item>
+    </string-array>
+
+    <string-array name="cap_cilindros_array">
+        <item>5</item>
+        <item>9</item>
+        <item>15</item>
+        <item>18</item>
+        <item>45</item>
+    </string-array>
+
+    <string-array name="estado_cilindros_array">
+        <item>BUENO</item>
+        <item>REGULAR</item>
+        <item>MALO</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_principal">Principal</string>
 </resources>

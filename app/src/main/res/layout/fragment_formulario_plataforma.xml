@@ -1,0 +1,385 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.aplications.glp.FormularioFragment">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingTop="10dp"
+        android:paddingBottom="3dp"
+        android:paddingRight="3dp"
+        android:paddingLeft="3dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/lblCilEntr"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/txt_cil_entregado_photo"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:inputType="number"
+                    android:maxLines="1"
+                    android:singleLine="true"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/lblCilEntr"
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/imgEntregado"
+                    android:scaleType="fitXY"
+                    android:onClick="eventoRegistrarFoto"
+                    android:tag="ENTREGADO"
+                    android:src="@drawable/photo"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:padding="5dp">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/lblCilRec"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/txt_cil_recibido_photo"
+                    android:inputType="number"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:layout_gravity="left"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/lblCilRec"
+                    android:scaleType="fitXY"
+                    android:id="@+id/imgRecibido"
+                    android:onClick="eventoRegistrarFoto"
+                    android:tag="RECIBIDO"
+                    android:src="@drawable/photo" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="7"
+            android:layout_marginTop="5dp">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@string/txt_ciudad"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"/>
+
+                    <Spinner
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/spinner_ciudades"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:entries="@array/ciudades_array"/>
+
+                </RelativeLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editFecha"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_fecha"
+                        android:inputType="date"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editHora"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_hora"
+                        android:inputType="time"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editVehiBase"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_vehi_base"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editNombreCliente"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_nombre_cliente"
+                        android:inputType="textPersonName"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <!--<android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editIdentificacionCliente"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_identificacion"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editDireccionCliente"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_direccion"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editTelefono"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_telefono"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>-->
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@string/txt_cap_cil_rec"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"/>
+
+                    <Spinner
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/spinner_cap_cil_rec"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:entries="@array/cap_cilindros_array"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@string/txt_cap_cil_ent"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"/>
+
+                    <Spinner
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/spinner_cap_cil_ent"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:entries="@array/cap_cilindros_array"/>
+
+                </RelativeLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editTara"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_tara"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editPesoReal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_peso_real"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editError"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_error"
+                        android:text="0.0049"
+                        android:enabled="false"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@string/hint_estado_cil_rec"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"/>
+
+                    <Spinner
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/spinner_estado_cil_rec"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:entries="@array/estado_cilindros_array"/>
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="fill_parent">
+
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="fill_parent"
+                            android:id="@+id/btnGuardar"
+                            android:text="@string/btn_guardar"
+                            android:onClick="eventoGuardar"
+                            android:layout_centerInParent="true"/>
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/btnGuardarAgregar"
+                            android:text="@string/btn_guardar_agregar"
+                            android:onClick="eventoGuardarAgregar"
+                            android:layout_centerInParent="true" />
+
+                    </RelativeLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+        </ScrollView>
+    </LinearLayout>
+
+</FrameLayout>
