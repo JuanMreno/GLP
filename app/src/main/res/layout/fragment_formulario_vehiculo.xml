@@ -6,6 +6,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:focusableInTouchMode="true"
         android:paddingTop="10dp"
         android:paddingBottom="3dp"
         android:paddingRight="3dp"
@@ -126,7 +127,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_fecha"
-                        android:inputType="number"
+                        android:inputType="date"
                         android:maxLines="1"
                         android:singleLine="true" />
 
@@ -141,7 +142,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_hora"
-                        android:inputType="number"
+                        android:inputType="time"
                         android:maxLines="1"
                         android:singleLine="true" />
 
@@ -156,7 +157,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_vehi_base"
-                        android:inputType="number"
+                        android:inputType="text"
                         android:maxLines="1"
                         android:singleLine="true" />
 
@@ -171,7 +172,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_nombre_cliente"
-                        android:inputType="number"
+                        android:inputType="textPersonName"
                         android:maxLines="1"
                         android:singleLine="true" />
 
@@ -201,7 +202,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_direccion"
-                        android:inputType="number"
+                        android:inputType="text"
                         android:maxLines="1"
                         android:singleLine="true" />
 
@@ -299,8 +300,8 @@
                         <Button
                             android:layout_width="wrap_content"
                             android:layout_height="fill_parent"
+                            android:id="@+id/btnGuardar"
                             android:text="@string/btn_guardar"
-                            android:onClick="eventoGuardar"
                             android:layout_centerInParent="true"/>
 
                     </RelativeLayout>
@@ -313,8 +314,8 @@
                         <Button
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:id="@+id/btnGuardarAgregar"
                             android:text="@string/btn_guardar_agregar"
-                            android:onClick="eventoGuardarAgregar"
                             android:layout_centerInParent="true" />
 
                     </RelativeLayout>

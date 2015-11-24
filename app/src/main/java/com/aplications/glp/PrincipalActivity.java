@@ -100,13 +100,14 @@ public class PrincipalActivity extends AppCompatActivity {
         }
     }
 
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_principal, menu);
         return true;
     }
-
+    */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -125,7 +126,12 @@ public class PrincipalActivity extends AppCompatActivity {
                 if(FileManager.isExternalStorageWritable() && FileManager.isExternalStorageReadable()){
                     File file = FileManager.getAlbumStorageDir(getString(R.string.app_name));
 
-                    if(file.exists()) file.delete();
+                    if (file.isDirectory())
+                    {
+                        String[] children = file.list();
+                        for (int i = 0; i < children.length; i++)
+                            new File(file, children[i]).delete();
+                    }
                 }
                 else{
                     Log.w(TAG,"action_cerrar_sesion, isExternalStorageWritable isExternalStorageReadable NULL");
@@ -328,6 +334,14 @@ public class PrincipalActivity extends AppCompatActivity {
 
     public Bitmap getBtmpCilEnt() {
         return btmpCilEnt;
+    }
+
+    public void setBtmpCilRec(Bitmap btmpCilRec) {
+        this.btmpCilRec = btmpCilRec;
+    }
+
+    public void setBtmpCilEnt(Bitmap btmpCilEnt) {
+        this.btmpCilEnt = btmpCilEnt;
     }
 
     public void writeData(){
