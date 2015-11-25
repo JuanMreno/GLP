@@ -40,7 +40,7 @@ public class FormularioFragmentPlataforma extends Fragment {
     private static final String CAP_CIL_REC_PARAM           = "param4";
     private static final String CAP_CIL_ENT_PARAM           = "param5";
     private static final String TARA_PARAM                  = "param6";
-    private static final String PESO_REAL_PARAM            = "param7";
+    private static final String PESO_REAL_PARAM             = "param7";
     private static final String ERROR_PARAM                 = "param8";
     private static final String ESTADO_REC_PARAM            = "param9";
 
@@ -189,14 +189,14 @@ public class FormularioFragmentPlataforma extends Fragment {
             public void onClick(View v) {
                 Log.w(TAG,"onClickListener");
                 if (
-                        fecha.getText().toString().equals("") ||
-                        hora.getText().toString().equals("") ||
-                        nombreCliente.getText().toString().equals("") ||
-                        tara.getText().toString().equals("") ||
-                        pesoReal.getText().toString().equals("") ||
-                        error.getText().toString().equals("") ||
-                        ((PrincipalActivity) getActivity()).getBtmpCilEnt() == null ||
-                        ((PrincipalActivity) getActivity()).getBtmpCilRec() == null
+                    fecha.getText().toString().equals("") ||
+                    hora.getText().toString().equals("") ||
+                    nombreCliente.getText().toString().equals("") ||
+                    tara.getText().toString().equals("") ||
+                    pesoReal.getText().toString().equals("") ||
+                    error.getText().toString().equals("") ||
+                    ((PrincipalActivity) getActivity()).getBtmpCilEnt() == null ||
+                    ((PrincipalActivity) getActivity()).getBtmpCilRec() == null
                 ) {
                     ((PrincipalActivity) getActivity()).toastMensaje(getActivity().getResources().getString(R.string.txt_toast_campos_req));
                     return;

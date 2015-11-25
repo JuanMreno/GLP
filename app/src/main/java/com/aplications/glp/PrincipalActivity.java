@@ -352,11 +352,7 @@ public class PrincipalActivity extends AppCompatActivity {
                 return;
             }
 
-            File root = new File(Environment.getExternalStorageDirectory(), getString(R.string.app_name));
-            if (!root.exists())
-                root.mkdirs();
-
-            File gpxfile = new File(root, REPORTES_FILE_NAME);
+            File gpxfile = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)), REPORTES_FILE_NAME);
 
             if(gpxfile.exists()) gpxfile.delete();
 
@@ -392,6 +388,7 @@ public class PrincipalActivity extends AppCompatActivity {
                             out.write(("<PESO_REAL>" + cursor.getString(15) +"</PESO_REAL>").getBytes("UTF-8"));
                             out.write(("<ERROR>" + cursor.getString(16) +"</ERROR>").getBytes("UTF-8"));
                             out.write(("<ESTADO>" + cursor.getString(17) + "</ESTADO>").getBytes("UTF-8"));
+                            out.write(("<VALOR>" + cursor.getString(18) + "</VALOR>").getBytes("UTF-8"));
 
                             out.write(("</entry>").getBytes("UTF-8"));
 
@@ -412,48 +409,7 @@ public class PrincipalActivity extends AppCompatActivity {
                 }
             }
 
-            /*
-
-            //writer.append("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><entries>");
-            //writer.flush();
-
-            Cursor cursor = sqlite.selectQuery("SELECT * FROM reportes");
-
-            if(cursor != null){
-                if(cursor.moveToFirst()){
-                    do{
-                        writer.append("<entry>");
-
-                        writer.append("<CIUDAD>"+               cursor.getString(1) +"</CIUDAD>");
-                        writer.append("<FECHA>"+                cursor.getString(2) +"</FECHA>");
-                        writer.append("<HORA>"+                 cursor.getString(3) +"</HORA>");
-                        writer.append("<VEHICULO>"+             cursor.getString(4) +"</VEHICULO>");
-                        writer.append("<NOMBRE_CLIENTE>"+       cursor.getString(5) +"</NOMBRE_CLIENTE>");
-                        writer.append("<IDENTIFICACION>"+       cursor.getString(6) +"</IDENTIFICACION>");
-                        writer.append("<DIRECCION>"+            cursor.getString(7) +"</DIRECCION>");
-                        writer.append("<TELEFONO>"+             cursor.getString(8) +"</TELEFONO>");
-                        writer.append("<CILINDRO_RECIBIDO>"+    cursor.getString(10) +"</CILINDRO_RECIBIDO>");
-                        writer.append("<CAP_CIL_REC>"+          cursor.getString(11) +"</CAP_CIL_REC>");
-                        writer.append("<CILINDRO_ENTREGADO>"+   cursor.getString(12) +"</CILINDRO_ENTREGADO>");
-                        writer.append("<CAP_CIL_ENT>"+          cursor.getString(13) +"</CAP_CIL_ENT>");
-                        writer.append("<TARA_CIL_ENT>"+         cursor.getString(14) +"</TARA_CIL_ENT>");
-                        writer.append("<PESO_REAL>"+            cursor.getString(15) +"</PESO_REAL>");
-                        writer.append("<ERROR>"+                cursor.getString(16) +"</ERROR>");
-                        writer.append("<ESTADO>"+               cursor.getString(17) +"</ESTADO>");
-
-                        writer.append("</entry>");
-
-                        writer.flush();
-                    }while(cursor.moveToNext());
-                }
-            }
-
-            writer.append("</entries>");
-            writer.flush();
-
-            writer.close();
-            */
-            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Reporte generado con éxito", Toast.LENGTH_SHORT).show();
             Log.w(TAG,gpxfile.getPath());
         }
         catch(IOException e)

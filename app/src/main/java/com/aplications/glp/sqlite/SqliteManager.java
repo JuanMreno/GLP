@@ -44,6 +44,7 @@ public class SqliteManager extends SQLiteOpenHelper {
                 "peso_real TEXT, " +
                 "error TEXT, " +
                 "estado TEXT, " +
+                "valor TEXT, " +
                 "fecha_registro datetime default current_timestamp " +
             ")");
     }};
