@@ -17,4 +17,10 @@
         android:orderInCategory="100"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_lista_registros"
+        android:title="@string/action_lista_registros"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
 </menu>

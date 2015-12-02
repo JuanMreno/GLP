@@ -4,9 +4,12 @@
     <string name="db_name">AppDb</string>
     <integer name="db_version">5</integer>
 
+    <string name="pass_cerrar_sesion">123456</string>
+
     <string name="action_settings">Settings</string>
     <string name="action_cerrar_sesion">Cerrar sesión</string>
     <string name="action_generar_reporte">Generar reporte</string>
+    <string name="action_lista_registros">Lista de Registros</string>
 
     <string name="txt_vehiculo">Vehículo</string>
     <string name="txt_plataforma">Plataforma</string>
@@ -35,6 +38,7 @@
     <string name="hint_peso_real">Peso Real (Kg)</string>
     <string name="hint_error">Error</string>
     <string name="hint_estado_cil_rec">Estado Cil. Recibido</string>
+    <string name="hint_contrasena">Contraseña</string>
 
 
     <string name="txt_ciudad">Ciudad</string>
@@ -62,11 +66,42 @@
 
     <string-array name="ciudades_array">
         <item>Pereira</item>
+        <item>Aguadas</item>
+        <item>Anserma</item>
+        <item>Apía</item>
+        <item>Aranzazu</item>
+        <item>Armenia</item>
+        <item>Balboa</item>
+        <item>Belalcazar</item>
+        <item>Belén de Umbría</item>
+        <item>Buenavista</item>
+        <item>Calarcá</item>
+        <item>Chinchina</item>
+        <item>Circasia</item>
+        <item>Córdoba</item>
         <item>Dosquebradas</item>
-        <item>La Virginia</item>
-        <item>Santa Rosa</item>
+        <item>Filadelfia</item>
+        <item>Filandia</item>
+        <item>Génova</item>
+        <item>Guatica</item>
+        <item>La Celía</item>
+        <item>La Merced</item>
+        <item>Manizales</item>
         <item>Marsella</item>
+        <item>Montenegro</item>
+        <item>Neira</item>
+        <item>Pácora</item>
+        <item>Palestina</item>
+        <item>Pijao</item>
+        <item>Quimbaya</item>
+        <item>Quinchía</item>
+        <item>Salamina</item>
+        <item>Salento</item>
+        <item>San José</item>
+        <item>Santa Rosa de Cabal</item>
         <item>Santuario</item>
+        <item>Supía</item>
+        <item>Villamaria</item>
     </string-array>
 
     <string-array name="cap_cilindros_array">
@@ -86,4 +121,5 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_principal">Principal</string>
+    <string name="title_activity_lista_registros">ListaRegistrosActivity</string>
 </resources>

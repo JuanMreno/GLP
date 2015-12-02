@@ -15,7 +15,6 @@ import com.google.gson.Gson;
 public class SharedPreferencesManager {
     static public String SESION_PROFILE = "SESION_PROFILE";
 
-
     SharedPreferences sharedPreferences;
     Context context;
 

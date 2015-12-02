@@ -5,29 +5,36 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.aplications.glp.objetos.Registro;
 import com.aplications.glp.objetos.SessionProfile;
 import com.aplications.glp.shared_preferences.SharedPreferencesManager;
 import com.aplications.glp.sqlite.SqliteManager;
 import com.aplications.glp.utils.FileManager;
+import com.google.gson.Gson;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -37,24 +44,36 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class PrincipalActivity extends AppCompatActivity {
+public class PrincipalActivity extends AppCompatActivity implements
+        DialogInterface.OnClickListener{
 
     private static String TAG = "PrincipalActivity";
     public static final String REGISTRO_INTENT_CODE = "RegistroIntentCode";
     public static final  String ENTREGADO_TAG = "ENTREGADO";
     public static final  String RECIBIDO_TAG = "RECIBIDO";
     public static final  String REPORTES_FILE_NAME = "reporte.xml";
+
+    public static final  String CIL_REC_TEMP_FILE_NAME = "cil_rec_temp.jpg";
+    public static final  String CIL_ENT_TEMP_FILE_NAME = "cil_ent_temp.jpg";
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    public static final int LISTA_REG_ACTIVITY_CODE = 2;
 
     public static final String MAIN_ACTIVITY_FRAGMENT_TAG = "PrincipalActivityFragmentTag";
     public static final String FORMULARIO_VEHICULO_FRAGMENT_TAG = "FormularioVehiculoFragmentTag";
     public static final String FORMULARIO_PLATAFORMA_FRAGMENT_TAG = "FormularioPlataformaFragmentTag";
+    public static final String EDITAR_VEHICULO_FRAGMENT_TAG = "EditarVehiculoFragmentTag";
+    public static final String EDITAR_PLATAFORMA_FRAGMENT_TAG = "EditarPlataformaFragmentTag";
 
     private SqliteManager sqlite;
     private String tipoImgSelec = "";
 
-    private Bitmap btmpCilRec = null;
-    private Bitmap btmpCilEnt = null;
+    private SessionProfile session;
+
+    private boolean crImgSet = false;
+    private boolean ceImgSet = false;
+
+    private boolean crImgEditada;
+    private boolean ceImgEditada;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,23 +100,8 @@ public class PrincipalActivity extends AppCompatActivity {
                 );
 
         SharedPreferencesManager sp = new SharedPreferencesManager(PrincipalActivity.this,SharedPreferencesManager.SESION_PROFILE);
-        FragmentManager fm = getSupportFragmentManager();
-
-        if(sp.getSesionData() != null){
-            if(sp.getSesionData().getTipoUsuario().equals(SessionProfile.TIPO_VEHICULO))
-                fm.beginTransaction()
-                        .replace(R.id.frame_container, new FormularioFragmentVehiculo(), FORMULARIO_VEHICULO_FRAGMENT_TAG)
-                        .commit();
-            else
-                fm.beginTransaction()
-                        .replace(R.id.frame_container,new FormularioFragmentPlataforma(), FORMULARIO_PLATAFORMA_FRAGMENT_TAG)
-                        .commit();
-        }
-        else{
-            fm.beginTransaction()
-                    .replace(R.id.frame_container, new PrincipalActivityFragment(), MAIN_ACTIVITY_FRAGMENT_TAG)
-                    .commit();
-        }
+        session = sp.getSesionData();
+        iniMain();
     }
 
     /*
@@ -115,32 +119,64 @@ public class PrincipalActivity extends AppCompatActivity {
 
         switch(id){
             case R.id.action_cerrar_sesion:
-                SharedPreferencesManager sp = new SharedPreferencesManager(PrincipalActivity.this,SharedPreferencesManager.SESION_PROFILE);
-                sp.removeSesionProfile();
+                LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 
-                FragmentManager fm = getSupportFragmentManager();
-                fm.beginTransaction()
-                        .replace(R.id.frame_container, new PrincipalActivityFragment(), MAIN_ACTIVITY_FRAGMENT_TAG)
-                        .commit();
+                View v = inflater.inflate(R.layout.dialog_content_cerrar_sesion,null);
 
-                if(FileManager.isExternalStorageWritable() && FileManager.isExternalStorageReadable()){
-                    File file = FileManager.getAlbumStorageDir(getString(R.string.app_name));
+                final EditText editText = (EditText)v.findViewById(R.id.editPass);
+                new AlertDialog.Builder(this)
+                    .setTitle("Validar cierre sesión")
+                    .setView(v)
+                    .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if(editText.getText().toString().equals("")){
+                                Toast.makeText(PrincipalActivity.this,"Campo requerido",Toast.LENGTH_LONG).show();
+                                return;
+                            }
 
-                    if (file.isDirectory())
-                    {
-                        String[] children = file.list();
-                        for (int i = 0; i < children.length; i++)
-                            new File(file, children[i]).delete();
-                    }
-                }
-                else{
-                    Log.w(TAG,"action_cerrar_sesion, isExternalStorageWritable isExternalStorageReadable NULL");
-                }
+                            String val = editText.getText().toString();
 
-                sqlite.query("DELETE FROM reportes");
+                            if(val.equals(getString(R.string.pass_cerrar_sesion))){
+                                SharedPreferencesManager sp = new SharedPreferencesManager(PrincipalActivity.this,SharedPreferencesManager.SESION_PROFILE);
+                                sp.removeSesionProfile();
+
+                                FragmentManager fm = getSupportFragmentManager();
+                                fm.beginTransaction()
+                                        .replace(R.id.frame_container, new PrincipalActivityFragment(), MAIN_ACTIVITY_FRAGMENT_TAG)
+                                        .commit();
+
+                                if(FileManager.isExternalStorageWritable() && FileManager.isExternalStorageReadable()){
+                                    File file = FileManager.getAlbumStorageDir(getString(R.string.app_name));
+
+                                    if (file.isDirectory())
+                                    {
+                                        String[] children = file.list();
+                                        for (int i = 0; i < children.length; i++)
+                                            new File(file, children[i]).delete();
+                                    }
+                                }
+                                else{
+                                    Log.w(TAG,"action_cerrar_sesion, isExternalStorageWritable isExternalStorageReadable NULL");
+                                }
+
+                                sqlite.query("DELETE FROM reportes");
+                            }
+                            else{
+                                Toast.makeText(PrincipalActivity.this,"Contraseña inválida.",Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    })
+                    .setNegativeButton("Cancelar",null)
+                    .create()
+                    .show();
                 break;
             case R.id.action_generar_reporte:
                 writeData();
+                break;
+            case R.id.action_lista_registros:
+                Intent intent = new Intent(this,ListaRegistrosActivity.class);
+                startActivityForResult(intent, LISTA_REG_ACTIVITY_CODE);
                 break;
             default:
                 break;
@@ -149,23 +185,101 @@ public class PrincipalActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        //No call for super(). Bug on API Level > 11.
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+        try{
+            if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+                //Bundle extras = data.getExtras();
+                //Bitmap imageBitmap = (Bitmap) extras.get("data");
 
-            ImageView imageView;
+                ImageView imageView;
 
-            if(tipoImgSelec.equals(RECIBIDO_TAG)){
-                imageView = (ImageView) findViewById(R.id.imgRecibido);
-                btmpCilRec = imageBitmap;
+                //saveImage(imageBitmap,"img_prueba");
+
+                if(tipoImgSelec.equals(RECIBIDO_TAG)){
+                    setCrImgEditada(true);
+                    imageView = (ImageView) findViewById(R.id.imgRecibido);
+
+                    File tempFile = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),CIL_REC_TEMP_FILE_NAME);
+                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                    bmOptions.inJustDecodeBounds = false;
+                    bmOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+                    bmOptions.inDither = true;
+
+                    Bitmap bitmap = BitmapFactory.decodeFile(tempFile.getAbsolutePath(),bmOptions);
+                    bitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getWidth()/30,bitmap.getHeight()/30,true);
+
+                    crImgSet = true;
+                    imageView.setImageBitmap(bitmap);
+                }
+                else{
+                    setCeImgEditada(true);
+                    imageView = (ImageView) findViewById(R.id.imgEntregado);
+
+                    File tempFile = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),CIL_ENT_TEMP_FILE_NAME);
+                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                    bmOptions.inJustDecodeBounds = false;
+                    bmOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+                    bmOptions.inDither = true;
+
+                    Bitmap bitmap = BitmapFactory.decodeFile(tempFile.getAbsolutePath(),bmOptions);
+                    bitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getWidth()/30,bitmap.getHeight()/30,true);
+
+                    ceImgSet = true;
+                    imageView.setImageBitmap(bitmap);
+                }
             }
-            else{
-                imageView = (ImageView) findViewById(R.id.imgEntregado);
-                btmpCilEnt = imageBitmap;
-            }
 
-            imageView.setImageBitmap(imageBitmap);
+            if (requestCode == LISTA_REG_ACTIVITY_CODE && resultCode == RESULT_OK) {
+                final String extra = data.getExtras().getString(ListaRegistrosActivity.REGISTRO_EXTRA);
+
+                if(!extra.equals("")){
+                    new Handler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            FragmentManager fm = getSupportFragmentManager();
+
+                            Registro registro = new Gson().fromJson(extra,Registro.class);
+                            if(session.getTipoUsuario().equals(SessionProfile.TIPO_VEHICULO)){
+                                fm.beginTransaction()
+                                        .replace(R.id.frame_container, EditarFragmentPlataforma.newInstance(registro), EDITAR_PLATAFORMA_FRAGMENT_TAG)
+                                        .commit();
+                            }
+                            else{
+                                fm.beginTransaction()
+                                        .replace(R.id.frame_container, EditarFragmentPlataforma.newInstance(registro), EDITAR_VEHICULO_FRAGMENT_TAG)
+                                        .commit();
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void iniMain(){
+        FragmentManager fm = getSupportFragmentManager();
+        if(session != null){
+            if(session.getTipoUsuario().equals(SessionProfile.TIPO_VEHICULO))
+                fm.beginTransaction()
+                        .replace(R.id.frame_container, new FormularioFragmentVehiculo(), FORMULARIO_VEHICULO_FRAGMENT_TAG)
+                        .commit();
+            else
+                fm.beginTransaction()
+                        .replace(R.id.frame_container,new FormularioFragmentPlataforma(), FORMULARIO_PLATAFORMA_FRAGMENT_TAG)
+                        .commit();
+        }
+        else{
+            fm.beginTransaction()
+                    .replace(R.id.frame_container, new PrincipalActivityFragment(), MAIN_ACTIVITY_FRAGMENT_TAG)
+                    .commit();
         }
     }
 
@@ -310,6 +424,14 @@ public class PrincipalActivity extends AppCompatActivity {
         tipoImgSelec = v.getTag().toString();
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        File tempFile;
+        if(tipoImgSelec.equals(RECIBIDO_TAG))
+            tempFile = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),CIL_REC_TEMP_FILE_NAME);
+        else
+            tempFile = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)), CIL_ENT_TEMP_FILE_NAME);
+
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tempFile));
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
@@ -326,22 +448,6 @@ public class PrincipalActivity extends AppCompatActivity {
 
     public void toastMensaje(String m){
         Toast.makeText(this, m, Toast.LENGTH_LONG).show();
-    }
-
-    public Bitmap getBtmpCilRec() {
-        return btmpCilRec;
-    }
-
-    public Bitmap getBtmpCilEnt() {
-        return btmpCilEnt;
-    }
-
-    public void setBtmpCilRec(Bitmap btmpCilRec) {
-        this.btmpCilRec = btmpCilRec;
-    }
-
-    public void setBtmpCilEnt(Bitmap btmpCilEnt) {
-        this.btmpCilEnt = btmpCilEnt;
     }
 
     public void writeData(){
@@ -372,6 +478,7 @@ public class PrincipalActivity extends AppCompatActivity {
                         do{
                             out.write("<entry>".getBytes("UTF-8"));
 
+                            out.write(("<N>" + cursor.getString(0) +"</N>").getBytes("UTF-8"));
                             out.write(("<CIUDAD>" + cursor.getString(1) +"</CIUDAD>").getBytes("UTF-8"));
                             out.write(("<FECHA>" + cursor.getString(2) +"</FECHA>").getBytes("UTF-8"));
                             out.write(("<HORA>" + cursor.getString(3) +"</HORA>").getBytes("UTF-8"));
@@ -394,6 +501,30 @@ public class PrincipalActivity extends AppCompatActivity {
 
                             out.flush();
                         }while(cursor.moveToNext());
+                        
+                        String finalRow = "<entry>" +
+                                "      <N></N>" +
+                                "      <CIUDAD></CIUDAD>" +
+                                "      <FECHA></FECHA>" +
+                                "      <HORA></HORA>" +
+                                "      <VEHICULO></VEHICULO>" +
+                                "      <NOMBRE_CLIENTE></NOMBRE_CLIENTE>" +
+                                "      <IDENTIFICACION></IDENTIFICACION>" +
+                                "      <DIRECCION></DIRECCION>" +
+                                "      <TELEFONO></TELEFONO>" +
+                                "      <CILINDRO_RECIBIDO></CILINDRO_RECIBIDO>" +
+                                "      <CAP_CIL_REC></CAP_CIL_REC>" +
+                                "      <CILINDRO_ENTREGADO></CILINDRO_ENTREGADO>" +
+                                "      <CAP_CIL_ENT></CAP_CIL_ENT>" +
+                                "      <TARA_CIL_ENT></TARA_CIL_ENT>" +
+                                "      <PESO_REAL></PESO_REAL>" +
+                                "      <ERROR></ERROR>" +
+                                "      <ESTADO></ESTADO>" +
+                                "      <VALOR></VALOR>" +
+                                "   </entry>";
+
+                        out.write((finalRow).getBytes("UTF-8"));
+                        out.flush();
                     }
                 }
 
@@ -416,5 +547,42 @@ public class PrincipalActivity extends AppCompatActivity {
         {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+
+    }
+
+    public boolean isCrImgSet() {
+        return crImgSet;
+    }
+
+    public void setCrImgSet(boolean crImgSet) {
+        this.crImgSet = crImgSet;
+    }
+
+    public boolean isCeImgSet() {
+        return ceImgSet;
+    }
+
+    public void setCeImgSet(boolean ceImgSet) {
+        this.ceImgSet = ceImgSet;
+    }
+
+    public boolean isCrImgEditada() {
+        return crImgEditada;
+    }
+
+    public void setCrImgEditada(boolean crImgEditada) {
+        this.crImgEditada = crImgEditada;
+    }
+
+    public boolean isCeImgEditada() {
+        return ceImgEditada;
+    }
+
+    public void setCeImgEditada(boolean ceImgEditada) {
+        this.ceImgEditada = ceImgEditada;
     }
 }

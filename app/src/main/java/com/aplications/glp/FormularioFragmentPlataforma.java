@@ -1,6 +1,8 @@
 package com.aplications.glp;
 
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -14,8 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.aplications.glp.objetos.SessionProfile;
 import com.aplications.glp.shared_preferences.SharedPreferencesManager;
@@ -25,6 +30,7 @@ import com.aplications.glp.utils.FileManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -104,9 +110,9 @@ public class FormularioFragmentPlataforma extends Fragment {
         ma.getSupportActionBar()
                 .setTitle(ma.getResources().getString(R.string.app_name) + " - " + ma.getResources().getString(R.string.txt_plataforma));
         ma.getSupportActionBar().show();
+        ma.setCeImgEditada(false);
+        ma.setCrImgEditada(false);
 
-        ma.setBtmpCilRec(null);
-        ma.setBtmpCilEnt(null);
         sqlite =
                 new SqliteManager(
                         getActivity(),
@@ -123,7 +129,7 @@ public class FormularioFragmentPlataforma extends Fragment {
 
         final Spinner spinnerCiudades     = (Spinner)view.findViewById(R.id.spinner_ciudades);
         final TextView fecha              = (TextView)view.findViewById(R.id.editFecha);
-        final TextView hora               = (TextView)view.findViewById(R.id.editHora);
+        final EditText hora               = (EditText)view.findViewById(R.id.editHora);
         final TextView vehiBase           = (TextView)view.findViewById(R.id.editVehiBase);
         final TextView nombreCliente      = (TextView)view.findViewById(R.id.editNombreCliente);
         final Spinner spinnerCapCilRec    = (Spinner)view.findViewById(R.id.spinner_cap_cil_rec);
@@ -147,6 +153,7 @@ public class FormularioFragmentPlataforma extends Fragment {
             tara.setText(taraParam);
             pesoReal.setText(pesoRealParam);
             error.setText(errorParam);
+            pesoReal.setText(pesoRealParam);
 
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.cap_cilindros_array, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -195,8 +202,8 @@ public class FormularioFragmentPlataforma extends Fragment {
                     tara.getText().toString().equals("") ||
                     pesoReal.getText().toString().equals("") ||
                     error.getText().toString().equals("") ||
-                    ((PrincipalActivity) getActivity()).getBtmpCilEnt() == null ||
-                    ((PrincipalActivity) getActivity()).getBtmpCilRec() == null
+                    !((PrincipalActivity) getActivity()).isCeImgSet() ||
+                    !((PrincipalActivity) getActivity()).isCrImgSet()
                 ) {
                     ((PrincipalActivity) getActivity()).toastMensaje(getActivity().getResources().getString(R.string.txt_toast_campos_req));
                     return;
@@ -207,6 +214,56 @@ public class FormularioFragmentPlataforma extends Fragment {
 
         btnGuardar.setOnClickListener(onClickListener);
         btnGuardarAgregar.setOnClickListener(onClickListener);
+
+        fecha.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    Calendar calendar = Calendar.getInstance();
+                    DatePickerDialog pickerDialog = new DatePickerDialog(
+                            getActivity(),
+                            new DatePickerDialog.OnDateSetListener() {
+                                @Override
+                                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                    fecha.setText(
+                                            String.valueOf(dayOfMonth) + "/" + String.valueOf(monthOfYear + 1) + "/" + String.valueOf(year));
+                                }
+                            },
+                            calendar.get(Calendar.YEAR),
+                            calendar.get(Calendar.MONTH),
+                            calendar.get(Calendar.DAY_OF_MONTH)
+                    );
+
+                    pickerDialog.setMessage("Fecha");
+                    pickerDialog.show();
+                }
+            }
+        });
+
+        hora.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    Calendar calendar = Calendar.getInstance();
+                    TimePickerDialog pickerDialog = new TimePickerDialog(
+                            getActivity(),
+                            new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                    hora.setText(String.valueOf(hourOfDay) + ":" + String.valueOf(minute));
+                                }
+                            },
+                            calendar.get(Calendar.HOUR),
+                            calendar.get(Calendar.MINUTE),
+                            true
+                    );
+
+                    pickerDialog.updateTime(calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE));
+                    pickerDialog.setMessage("Hora");
+                    pickerDialog.show();
+                }
+            }
+        });
 
         return view;
     }
@@ -231,8 +288,8 @@ public class FormularioFragmentPlataforma extends Fragment {
         TextView error              = (TextView)getView().findViewById(R.id.editError);
         Spinner spinnerEstadoCilRec = (Spinner)getView().findViewById(R.id.spinner_estado_cil_rec);
 
-        Bitmap btmpCilRec = ((PrincipalActivity)getActivity()).getBtmpCilRec();
-        Bitmap btmpCilEnt = ((PrincipalActivity)getActivity()).getBtmpCilEnt();
+        //Bitmap btmpCilRec = ((PrincipalActivity)getActivity()).getBtmpCilRec();
+        //Bitmap btmpCilEnt = ((PrincipalActivity)getActivity()).getBtmpCilEnt();
 
         sqlite.query(
             "INSERT INTO " +
@@ -254,7 +311,8 @@ public class FormularioFragmentPlataforma extends Fragment {
                 "tara_cil_ent," +
                 "peso_real," +
                 "error," +
-                "estado" +
+                "estado," +
+                "valor" +
             ") " +
             "VALUES" +
             "(" +
@@ -274,7 +332,8 @@ public class FormularioFragmentPlataforma extends Fragment {
                 "'" + tara.getText().toString() + "'," +
                 "'" + pesoReal.getText().toString() + "'," +
                 "'" + error.getText().toString() + "'," +
-                "'" + spinnerEstadoCilRec.getSelectedItem().toString() + "'" +
+                "'" + spinnerEstadoCilRec.getSelectedItem().toString() + "'," +
+                "''" +
             ")"
         );
 
@@ -287,15 +346,24 @@ public class FormularioFragmentPlataforma extends Fragment {
 
         if(cursor.moveToFirst()){
             String id = cursor.getString(0);
-            String crRuta = saveImage(btmpCilRec,"CR_"+id);
-            if(crRuta == null){
-                Log.w(TAG,"btmpCilRec NO GUARDADO");
-            }
 
-            String ceRuta = saveImage(btmpCilEnt,"CE_"+id);
-            if(ceRuta == null){
-                Log.w(TAG,"btmpCilEnt NO GUARDADO");
-            }
+            File crFile = new File(
+                    FileManager.getAlbumStorageDir(getString(R.string.app_name)),
+                    PrincipalActivity.CIL_REC_TEMP_FILE_NAME
+            );
+
+            File ceFile = new File(
+                    FileManager.getAlbumStorageDir(getString(R.string.app_name)),
+                    PrincipalActivity.CIL_ENT_TEMP_FILE_NAME);
+
+            File crFileRenamed = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),"CR_"+id+".jpg");
+            File ceFileRenamed = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),"CE_"+id+".jpg");
+
+            crFile.renameTo(crFileRenamed);
+            ceFile.renameTo(ceFileRenamed);
+
+            String crRuta = crFileRenamed.getAbsolutePath();
+            String ceRuta = ceFileRenamed.getAbsolutePath();
 
             String crCampo  = crRuta != null ? crRuta : "";
             String ceCampo  = ceRuta != null ? ceRuta : "";
