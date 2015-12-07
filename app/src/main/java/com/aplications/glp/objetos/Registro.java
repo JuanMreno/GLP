@@ -33,7 +33,7 @@ public class Registro {
     String fechaRegistro;
     String tipoUsuario;
 
-    public Registro(String id, String ciudad, String fecha, String hora, String vehiBase, String nombreCliente, String identificacion, String direccion, String telefono, String recarga, String bmpCilRecCod, String capCilRec, String bmpCilEntCod, String capCilEnt, String tara, String pesoReal, String error, String estado, String valor, String fechaRegistro) {
+    public Registro(String id, String ciudad, String fecha, String hora, String vehiBase, String nombreCliente, String identificacion, String direccion, String telefono, String recargaN, String bmpCilRecCod, String capCilRec, String bmpCilEntCod, String capCilEnt, String tara, String pesoReal, String error, String estado, String valor, String fechaRegistro) {
         this.id = id;
         this.ciudad = ciudad;
         this.fecha = fecha;

@@ -1,7 +1,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.aplications.glp.FormularioFragmentPlataforma">
+    tools:context="com.aplications.glp.EditarFragmentVehiculo">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -23,7 +23,7 @@
             <RelativeLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:padding="5dp">
 
                 <TextView
@@ -54,7 +54,7 @@
             <RelativeLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:padding="5dp">
 
                 <TextView
@@ -178,6 +178,66 @@
 
                 </android.support.design.widget.TextInputLayout>
 
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editIdentificacionCliente"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_identificacion"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editDireccionCliente"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_direccion"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editTelefono"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_telefono"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/editRecargaN"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_recarga_n"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
                 <RelativeLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -231,71 +291,15 @@
                     android:layout_height="wrap_content">
 
                     <EditText
-                        android:id="@+id/editTara"
+                        android:id="@+id/editValor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/hint_tara"
+                        android:hint="@string/hint_valor"
                         android:inputType="number"
                         android:maxLines="1"
                         android:singleLine="true" />
 
                 </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:id="@+id/editPesoReal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/hint_peso_real"
-                        android:inputType="number"
-                        android:maxLines="1"
-                        android:singleLine="true" />
-
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:id="@+id/editError"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/hint_error"
-                        android:text="0.0049"
-                        android:enabled="false"
-                        android:inputType="number"
-                        android:maxLines="1"
-                        android:singleLine="true" />
-
-                </android.support.design.widget.TextInputLayout>
-
-                <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="@string/hint_estado_cil_rec"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentLeft="true"/>
-
-                    <Spinner
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/spinner_estado_cil_rec"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:entries="@array/estado_cilindros_array"/>
-
-                </RelativeLayout>
 
                 <LinearLayout
                     android:layout_width="fill_parent"
@@ -304,30 +308,15 @@
                     android:orientation="horizontal">
 
                     <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="fill_parent">
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="fill_parent"
-                            android:id="@+id/btnGuardar"
-                            android:text="@string/btn_guardar"
-                            android:layout_centerInParent="true"/>
-
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content">
 
                         <Button
-                            android:layout_width="wrap_content"
+                            android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
-                            android:id="@+id/btnGuardarAgregar"
-                            android:text="@string/btn_guardar_agregar"
-                            android:layout_centerInParent="true" />
+                            android:id="@+id/btnGuardar"
+                            android:text="@string/btn_guardar"
+                            android:layout_centerInParent="true"/>
 
                     </RelativeLayout>
                 </LinearLayout>

@@ -4,6 +4,7 @@ package com.aplications.glp;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -31,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -95,7 +97,7 @@ public class EditarFragmentPlataforma extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_formulario_plataforma, container, false);
+        View view = inflater.inflate(R.layout.fragment_edit_form_plataforma, container, false);
 
         final Spinner spinnerCiudades     = (Spinner)view.findViewById(R.id.spinner_ciudades);
         final TextView fecha              = (TextView)view.findViewById(R.id.editFecha);
@@ -111,8 +113,6 @@ public class EditarFragmentPlataforma extends Fragment {
         final Spinner spinnerEstadoCilRec = (Spinner)view.findViewById(R.id.spinner_estado_cil_rec);
 
         Button btnGuardar           = (Button)view.findViewById(R.id.btnGuardar);
-        Button btnGuardarAgregar    = (Button)view.findViewById(R.id.btnGuardarAgregar);
-        btnGuardarAgregar.setVisibility(Button.GONE);
 
         vehiBase.setText(session.getTipoNombre());
 
@@ -147,21 +147,20 @@ public class EditarFragmentPlataforma extends Fragment {
                 spinnerEstadoCilRec.setSelection(spinnerPosition);
             }
 
-            byte[] decodedByte = Base64.decode(registro.getBmpCilEnCod(), 0);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+            ////////    IMAGEN CILINDRO ENTREGADO   ////////////////////////////////////////////////
+            ImageView imgEntregado = (ImageView) view.findViewById(R.id.imgEntregado);
 
-            ImageView imageView = (ImageView) view.findViewById(R.id.imgEntregado);
-            imageView.setImageBitmap(bitmap);
+            String[] paramsEnt = new String[1];
+            paramsEnt[0] = registro.getBmpCilEnCod();
+            new BitmapWorkerTask(imgEntregado).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, paramsEnt);
 
+            ////////    IMAGEN CILINDRO RECIBIDO    ////////////////////////////////////////////////
+            ImageView imgRecibido = (ImageView) view.findViewById(R.id.imgRecibido);
 
-            decodedByte = Base64.decode(registro.getBmpCilRecCod(), 0);
-            bitmap = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+            String[] paramsRec = new String[1];
+            paramsRec[0] = registro.getBmpCilRecCod();
+            new BitmapWorkerTask(imgRecibido).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, paramsRec);
 
-            imageView = (ImageView) view.findViewById(R.id.imgRecibido);
-            imageView.setImageBitmap(bitmap);
-
-            //ma.setBtmpCilEnt(registro.getBmpCilEnCod());
-            //ma.setBtmpCilRec(registro.getBmpCilRecCod());
         }
 
         String compareValue = registro.getCiudad();
@@ -199,7 +198,7 @@ public class EditarFragmentPlataforma extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_principal,menu);
+        inflater.inflate(R.menu.menu_principal, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -240,22 +239,30 @@ public class EditarFragmentPlataforma extends Fragment {
                         " id = " + registro.getId()
         );
 
-        if(!ma.isCrImgEditada()){
+        if(ma.isCrImgEditada()){
             File crFile = new File(
                     FileManager.getAlbumStorageDir(getString(R.string.app_name)),
                     PrincipalActivity.CIL_REC_TEMP_FILE_NAME
             );
 
             File crFileToRename = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),"CR_"+registro.getId()+".jpg");
+
+            if(crFileToRename.exists())
+                crFileToRename.delete();
+
             crFile.renameTo(crFileToRename);
         }
 
-        if(!ma.isCeImgEditada()){
+        if(ma.isCeImgEditada()){
             File ceFile = new File(
                     FileManager.getAlbumStorageDir(getString(R.string.app_name)),
                     PrincipalActivity.CIL_ENT_TEMP_FILE_NAME);
 
             File ceFileToRename = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),"CE_"+registro.getId()+".jpg");
+
+            if(ceFileToRename.exists())
+                ceFileToRename.delete();
+
             ceFile.renameTo(ceFileToRename);
         }
 
@@ -263,38 +270,73 @@ public class EditarFragmentPlataforma extends Fragment {
         ma.iniMain();
     }
 
-    private String saveImage(Bitmap bitmap, String name){
-        String ruta = null;
-        try{
-            if(FileManager.isExternalStorageWritable()){
-                File file = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),name+".jpg");
+    class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
+        private final WeakReference<ImageView> imageViewReference;
 
-                if(file.exists()) file.delete();
+        public BitmapWorkerTask(ImageView imageView) {
+            // Use a WeakReference to ensure the ImageView can be garbage collected
+            imageViewReference = new WeakReference<ImageView>(imageView);
+        }
 
-                FileOutputStream out = null;
-                try {
-                    out = new FileOutputStream(file);
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                    ruta = file.getPath();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (out != null) {
-                            out.close();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        // Decode image in background.
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            String path = params[0];
+
+            Log.w("BitmapWorkerTask","img path: " + path);
+            return decodeSampledBitmapFromFile(path);
+        }
+
+        // Once complete, see if ImageView is still around and set bitmap.
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            if (imageViewReference != null && bitmap != null) {
+                final ImageView imageView = imageViewReference.get();
+                if (imageView != null) {
+                    imageView.setImageBitmap(bitmap);
                 }
             }
-            else {
-                Log.w(TAG, "isExternalStorageWritable FALSE");
+        }
+    }
+
+    public static Bitmap decodeSampledBitmapFromFile(String path) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path,options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, options.outWidth/30, options.outWidth/30);
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        options.inDither = true;
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(path, options);
+    }
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
             }
         }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return ruta;
+
+        return inSampleSize;
     }
+
 }

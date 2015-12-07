@@ -134,7 +134,7 @@ public class FormularioFragmentVehiculo extends Fragment {
         final TextView editDireccionCliente         = (TextView)view.findViewById(R.id.editDireccionCliente);
         final TextView editTelefono                 = (TextView)view.findViewById(R.id.editTelefono);
         final TextView editValor                    = (TextView)view.findViewById(R.id.editValor);
-        final TextView editRecargaN                    = (TextView)view.findViewById(R.id.editRecargaN);
+        final TextView editRecargaN                 = (TextView)view.findViewById(R.id.editRecargaN);
 
         final Spinner spinnerCapCilRec              = (Spinner)view.findViewById(R.id.spinner_cap_cil_rec);
         final Spinner spinnerCapCilEnt              = (Spinner)view.findViewById(R.id.spinner_cap_cil_ent);
@@ -264,6 +264,7 @@ public class FormularioFragmentVehiculo extends Fragment {
                 }
             }
         });
+        System.gc();
         return view;
     }
 
@@ -333,6 +334,8 @@ public class FormularioFragmentVehiculo extends Fragment {
                 "'" + editValor.getText().toString() + "'" +
             ")"
         );
+
+        Log.w(TAG,"editRecargaN: " + editRecargaN.getText().toString());
 
         Cursor cursor = sqlite.selectQuery("SELECT last_insert_rowid()");
 
@@ -407,40 +410,4 @@ public class FormularioFragmentVehiculo extends Fragment {
             Log.w(TAG,"last_insert_rowid vacio");
         }
     }
-
-    private String saveImage(Bitmap bitmap, String name){
-        String ruta = null;
-        try{
-            if(FileManager.isExternalStorageWritable()){
-                File file = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),name+".jpg");
-
-                if(file.exists()) file.delete();
-
-                FileOutputStream out = null;
-                try {
-                    out = new FileOutputStream(file);
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                    ruta = file.getPath();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (out != null) {
-                            out.close();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            else {
-                Log.w(TAG, "isExternalStorageWritable FALSE");
-            }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return ruta;
-    }
-
 }

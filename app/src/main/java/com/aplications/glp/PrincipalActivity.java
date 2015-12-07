@@ -55,8 +55,9 @@ public class PrincipalActivity extends AppCompatActivity implements
 
     public static final  String CIL_REC_TEMP_FILE_NAME = "cil_rec_temp.jpg";
     public static final  String CIL_ENT_TEMP_FILE_NAME = "cil_ent_temp.jpg";
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
-    public static final int LISTA_REG_ACTIVITY_CODE = 2;
+    private static final int    REQUEST_IMAGE_CAPTURE = 1;
+    public static final int     LISTA_REG_ACTIVITY_CODE = 2;
+    private int                 REQUEST_IMAGE_EDIT_CAPTURE = 3;
 
     public static final String MAIN_ACTIVITY_FRAGMENT_TAG = "PrincipalActivityFragmentTag";
     public static final String FORMULARIO_VEHICULO_FRAGMENT_TAG = "FormularioVehiculoFragmentTag";
@@ -104,14 +105,11 @@ public class PrincipalActivity extends AppCompatActivity implements
         iniMain();
     }
 
-    /*
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_principal, menu);
-        return true;
+    protected void onDestroy() {
+        System.gc();
+        super.onDestroy();
     }
-    */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -198,39 +196,21 @@ public class PrincipalActivity extends AppCompatActivity implements
 
                 ImageView imageView;
 
-                //saveImage(imageBitmap,"img_prueba");
-
                 if(tipoImgSelec.equals(RECIBIDO_TAG)){
                     setCrImgEditada(true);
                     imageView = (ImageView) findViewById(R.id.imgRecibido);
 
                     File tempFile = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),CIL_REC_TEMP_FILE_NAME);
-                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                    bmOptions.inJustDecodeBounds = false;
-                    bmOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-                    bmOptions.inDither = true;
-
-                    Bitmap bitmap = BitmapFactory.decodeFile(tempFile.getAbsolutePath(),bmOptions);
-                    bitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getWidth()/30,bitmap.getHeight()/30,true);
-
                     crImgSet = true;
-                    imageView.setImageBitmap(bitmap);
+                    imageView.setImageBitmap(decodeSampledBitmapFromFile(tempFile.getAbsolutePath()));
                 }
                 else{
                     setCeImgEditada(true);
                     imageView = (ImageView) findViewById(R.id.imgEntregado);
 
                     File tempFile = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),CIL_ENT_TEMP_FILE_NAME);
-                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                    bmOptions.inJustDecodeBounds = false;
-                    bmOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-                    bmOptions.inDither = true;
-
-                    Bitmap bitmap = BitmapFactory.decodeFile(tempFile.getAbsolutePath(),bmOptions);
-                    bitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getWidth()/30,bitmap.getHeight()/30,true);
-
                     ceImgSet = true;
-                    imageView.setImageBitmap(bitmap);
+                    imageView.setImageBitmap(decodeSampledBitmapFromFile(tempFile.getAbsolutePath()));
                 }
             }
 
@@ -246,12 +226,12 @@ public class PrincipalActivity extends AppCompatActivity implements
                             Registro registro = new Gson().fromJson(extra,Registro.class);
                             if(session.getTipoUsuario().equals(SessionProfile.TIPO_VEHICULO)){
                                 fm.beginTransaction()
-                                        .replace(R.id.frame_container, EditarFragmentPlataforma.newInstance(registro), EDITAR_PLATAFORMA_FRAGMENT_TAG)
+                                        .replace(R.id.frame_container, EditarFragmentVehiculo.newInstance(registro), EDITAR_VEHICULO_FRAGMENT_TAG)
                                         .commit();
                             }
                             else{
                                 fm.beginTransaction()
-                                        .replace(R.id.frame_container, EditarFragmentPlataforma.newInstance(registro), EDITAR_VEHICULO_FRAGMENT_TAG)
+                                        .replace(R.id.frame_container, EditarFragmentPlataforma.newInstance(registro), EDITAR_PLATAFORMA_FRAGMENT_TAG)
                                         .commit();
                             }
                         }
@@ -262,6 +242,30 @@ public class PrincipalActivity extends AppCompatActivity implements
         catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        FragmentManager fm = getSupportFragmentManager();
+
+        EditarFragmentPlataforma fp = (EditarFragmentPlataforma) fm.findFragmentByTag(EDITAR_PLATAFORMA_FRAGMENT_TAG);
+        if(fp != null){
+            if(fp.isVisible()){
+                iniMain();
+                return;
+            }
+        }
+
+        EditarFragmentVehiculo fv = (EditarFragmentVehiculo) fm.findFragmentByTag(EDITAR_VEHICULO_FRAGMENT_TAG);
+        if(fv != null){
+            if(fv.isVisible()){
+                iniMain();
+                return;
+            }
+        }
+
+        finish();
+        super.onBackPressed();
     }
 
     public void iniMain(){
@@ -376,7 +380,7 @@ public class PrincipalActivity extends AppCompatActivity implements
                 .show();
     }
 
-    public void eventoIngresar(View v){
+    public void eventoIngresar(View v) {
         final EditText editVehiPlat   = (EditText) findViewById(R.id.editVehiBase);
 
         if(editVehiPlat.equals("")){
@@ -425,13 +429,43 @@ public class PrincipalActivity extends AppCompatActivity implements
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        File tempFile;
-        if(tipoImgSelec.equals(RECIBIDO_TAG))
-            tempFile = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),CIL_REC_TEMP_FILE_NAME);
-        else
-            tempFile = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)), CIL_ENT_TEMP_FILE_NAME);
+        File fileToWrite = null;
+        /*
+        FragmentManager fm = getSupportFragmentManager();
+        if(session.getTipoUsuario().equals(SessionProfile.TIPO_VEHICULO)){
+            EditarFragmentVehiculo fv = (EditarFragmentVehiculo)fm.findFragmentByTag(EDITAR_VEHICULO_FRAGMENT_TAG);
 
-        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tempFile));
+            if(fv != null){
+                if(fv.isVisible()){
+                    if(tipoImgSelec.equals(RECIBIDO_TAG))
+                        fileToWrite = new File(fv.getImgCilRecName());
+                    else
+                        fileToWrite = new File(fv.getImgCilEntName());
+                }
+            }
+        }
+        else{
+            EditarFragmentPlataforma fp = (EditarFragmentPlataforma)fm.findFragmentByTag(EDITAR_PLATAFORMA_FRAGMENT_TAG);
+
+            if(fp != null){
+                if(fp.isVisible()){
+                    if(tipoImgSelec.equals(RECIBIDO_TAG))
+                        fileToWrite = new File(fp.getImgCilRecName());
+                    else
+                        fileToWrite = new File(fp.getImgCilEntName());
+                }
+            }
+        }
+        */
+
+        if(fileToWrite == null){
+            if(tipoImgSelec.equals(RECIBIDO_TAG))
+                fileToWrite = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),CIL_REC_TEMP_FILE_NAME);
+            else
+                fileToWrite = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)), CIL_ENT_TEMP_FILE_NAME);
+        }
+
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(fileToWrite));
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
@@ -584,5 +618,43 @@ public class PrincipalActivity extends AppCompatActivity implements
 
     public void setCeImgEditada(boolean ceImgEditada) {
         this.ceImgEditada = ceImgEditada;
+    }
+
+    public static Bitmap decodeSampledBitmapFromFile(String path) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path,options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, options.outWidth/10, options.outWidth/10);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(path, options);
+    }
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 }

@@ -3,6 +3,8 @@ package com.aplications.glp;
 
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -27,6 +30,7 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -88,7 +92,7 @@ public class EditarFragmentVehiculo extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_formulario_vehiculo, container, false);
+        View view = inflater.inflate(R.layout.fragment_edit_form_vehiculo, container, false);
 
         final Spinner spinnerCiudades               = (Spinner)view.findViewById(R.id.spinner_ciudades);
         final TextView fecha                        = (TextView)view.findViewById(R.id.editFecha);
@@ -99,13 +103,12 @@ public class EditarFragmentVehiculo extends Fragment {
         final TextView editDireccionCliente         = (TextView)view.findViewById(R.id.editDireccionCliente);
         final TextView editTelefono                 = (TextView)view.findViewById(R.id.editTelefono);
         final TextView editValor                    = (TextView)view.findViewById(R.id.editValor);
-        final TextView editRecargaN                    = (TextView)view.findViewById(R.id.editRecargaN);
+        final TextView editRecargaN                 = (TextView)view.findViewById(R.id.editRecargaN);
 
         final Spinner spinnerCapCilRec              = (Spinner)view.findViewById(R.id.spinner_cap_cil_rec);
         final Spinner spinnerCapCilEnt              = (Spinner)view.findViewById(R.id.spinner_cap_cil_ent);
         
         Button btnGuardar           = (Button)view.findViewById(R.id.btnGuardar);
-        Button btnGuardarAgregar    = (Button)view.findViewById(R.id.btnGuardarAgregar);
 
         vehiBase.setText(session.getTipoNombre());
 
@@ -117,6 +120,8 @@ public class EditarFragmentVehiculo extends Fragment {
             editIdentificacionCliente.setText(registro.getIdentificacion());
             editDireccionCliente.setText(registro.getDireccion());
             editTelefono.setText(registro.getTelefono());
+            editRecargaN.setText(registro.getRecargaN());
+            editValor.setText(registro.getValor());
 
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.cap_cilindros_array, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -131,6 +136,21 @@ public class EditarFragmentVehiculo extends Fragment {
                 int spinnerPosition = adapter.getPosition(registro.getCapCilEnt());
                 spinnerCapCilEnt.setSelection(spinnerPosition);
             }
+
+            ////////    IMAGEN CILINDRO ENTREGADO   ////////////////////////////////////////////////
+            ImageView imgEntregado = (ImageView) view.findViewById(R.id.imgEntregado);
+
+            String[] paramsEnt = new String[1];
+            paramsEnt[0] = registro.getBmpCilEnCod();
+            new BitmapWorkerTask(imgEntregado).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, paramsEnt);
+
+            ////////    IMAGEN CILINDRO RECIBIDO    ////////////////////////////////////////////////
+            ImageView imgRecibido = (ImageView) view.findViewById(R.id.imgRecibido);
+
+            String[] paramsRec = new String[1];
+            paramsRec[0] = registro.getBmpCilRecCod();
+            new BitmapWorkerTask(imgRecibido).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, paramsRec);
+
         }
 
         String compareValue =registro.getCiudad();
@@ -147,14 +167,14 @@ public class EditarFragmentVehiculo extends Fragment {
             public void onClick(View v) {
                 if (
                         fecha.getText().toString().equals("") ||
-                                hora.getText().toString().equals("") ||
-                                editNombreCliente.getText().toString().equals("") ||
-                                editIdentificacionCliente.getText().toString().equals("") ||
-                                editDireccionCliente.getText().toString().equals("") ||
-                                editTelefono.getText().toString().equals("") ||
-                                editValor.getText().toString().equals("") ||
-                                editRecargaN.getText().toString().equals("")
-                        ) {
+                        hora.getText().toString().equals("") ||
+                        editNombreCliente.getText().toString().equals("") ||
+                        editIdentificacionCliente.getText().toString().equals("") ||
+                        editDireccionCliente.getText().toString().equals("") ||
+                        editTelefono.getText().toString().equals("") ||
+                        editValor.getText().toString().equals("") ||
+                        editRecargaN.getText().toString().equals("")
+                ) {
                     ((PrincipalActivity) getActivity()).toastMensaje(getActivity().getResources().getString(R.string.txt_toast_campos_req));
                     return;
                 }
@@ -163,14 +183,13 @@ public class EditarFragmentVehiculo extends Fragment {
         };
 
         btnGuardar.setOnClickListener(onClickListener);
-        btnGuardarAgregar.setOnClickListener(onClickListener);
 
         return view;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_principal,menu);
+        inflater.inflate(R.menu.menu_principal, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -190,67 +209,53 @@ public class EditarFragmentVehiculo extends Fragment {
         Spinner spinnerCapCilEnt              = (Spinner)getView().findViewById(R.id.spinner_cap_cil_ent);
 
         sqlite.query(
-            "INSERT INTO " +
-                "reportes " +
-            "(" +
-                "ciudad," +
-                "fecha," +
-                "hora," +
-                "vehiculo," +
-                "nombre_cliente," +
-                "identificacion," +
-                "direccion," +
-                "telefono," +
-                "recarga_n," +
-                "cilindro_recibido," +
-                "cap_cil_rec," +
-                "cilindro_entregado," +
-                "cap_cil_ent," +
-                "tara_cil_ent," +
-                "peso_real," +
-                "error," +
-                "estado," +
-                "valor" +
-            ") " +
-            "VALUES" +
-            "(" +
-                "'" + spinnerCiudades.getSelectedItem().toString() + "'," +
-                "'" + fecha.getText().toString() + "'," +
-                "'" + hora.getText().toString() + "'," +
-                "'" + vehiBase.getText().toString() + "'," +
-                "'" + editNombreCliente.getText().toString() + "'," +
-                "'" + editIdentificacionCliente.getText().toString() + "'," +
-                "'" + editDireccionCliente.getText().toString() + "'," +
-                "'" + editTelefono.getText().toString() + "'," +
-                "'" + editRecargaN.getText().toString() + "'," +
-                "'" + "" + "'," +
-                "'" + spinnerCapCilRec.getSelectedItem().toString() + "'," +
-                "'" + "" + "'," +
-                "'" + spinnerCapCilEnt.getSelectedItem().toString() + "'," +
-                "'" + "" + "'," +
-                "'" + "" + "'," +
-                "'" + "" + "'," +
-                "'" + "" + "'," +
-                "'" + editValor.getText().toString() + "'" +
-            ")"
+                "UPDATE " +
+                    "reportes " +
+                "SET " +
+                    "ciudad = '" + spinnerCiudades.getSelectedItem().toString() + "'," +
+                    "fecha = '" + fecha.getText().toString() + "'," +
+                    "hora = '" + hora.getText().toString() + "'," +
+                    "vehiculo = '" + vehiBase.getText().toString() + "'," +
+                    "nombre_cliente = '" + editNombreCliente.getText().toString() + "'," +
+                    "identificacion = '" + editIdentificacionCliente.getText().toString() + "'," +
+                    "direccion = '" + editDireccionCliente.getText().toString() + "'," +
+                    "telefono = '" + editTelefono.getText().toString() + "'," +
+                    "recarga_n = '" + editRecargaN.getText().toString() + "'," +
+                    "cap_cil_rec = '" + spinnerCapCilRec.getSelectedItem().toString() + "'," +
+                    "cap_cil_ent = '" + spinnerCapCilEnt.getSelectedItem().toString() + "'," +
+                    "tara_cil_ent = '" + "" + "'," +
+                    "peso_real = '" + "" + "'," +
+                    "error = '" + "" + "'," +
+                    "estado = '" + "" + "'," +
+                    "valor = '" + editValor.getText().toString() + "' " +
+                " WHERE " +
+                    " id = " + registro.getId()
         );
 
-        if(!ma.isCrImgEditada()){
+        if(ma.isCrImgEditada()){
             File crFile = new File(
                     FileManager.getAlbumStorageDir(getString(R.string.app_name)),
                     PrincipalActivity.CIL_REC_TEMP_FILE_NAME
             );
 
             File crFileToRename = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),"CR_"+registro.getId()+".jpg");
+
+            if(crFileToRename.exists())
+                crFileToRename.delete();
+
             crFile.renameTo(crFileToRename);
         }
 
-        if(!ma.isCeImgEditada()){
+        if(ma.isCeImgEditada()){
             File ceFile = new File(
                     FileManager.getAlbumStorageDir(getString(R.string.app_name)),
                     PrincipalActivity.CIL_ENT_TEMP_FILE_NAME);
 
             File ceFileToRename = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),"CE_"+registro.getId()+".jpg");
+
+            if(ceFileToRename.exists())
+                ceFileToRename.delete();
+
             ceFile.renameTo(ceFileToRename);
         }
 
@@ -258,39 +263,73 @@ public class EditarFragmentVehiculo extends Fragment {
         ma.iniMain();
     }
 
-    private String saveImage(Bitmap bitmap, String name){
-        String ruta = null;
-        try{
-            if(FileManager.isExternalStorageWritable()){
-                File file = new File(FileManager.getAlbumStorageDir(getString(R.string.app_name)),name+".jpg");
+    class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
+        private final WeakReference<ImageView> imageViewReference;
 
-                if(file.exists()) file.delete();
+        public BitmapWorkerTask(ImageView imageView) {
+            // Use a WeakReference to ensure the ImageView can be garbage collected
+            imageViewReference = new WeakReference<ImageView>(imageView);
+        }
 
-                FileOutputStream out = null;
-                try {
-                    out = new FileOutputStream(file);
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                    ruta = file.getPath();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (out != null) {
-                            out.close();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        // Decode image in background.
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            String path = params[0];
+
+            Log.w("BitmapWorkerTask","img path: " + path);
+            return decodeSampledBitmapFromFile(path);
+        }
+
+        // Once complete, see if ImageView is still around and set bitmap.
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            if (imageViewReference != null && bitmap != null) {
+                final ImageView imageView = imageViewReference.get();
+                if (imageView != null) {
+                    imageView.setImageBitmap(bitmap);
                 }
             }
-            else {
-                Log.w(TAG, "isExternalStorageWritable FALSE");
+        }
+    }
+
+    public static Bitmap decodeSampledBitmapFromFile(String path) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path,options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, options.outWidth/30, options.outWidth/30);
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        options.inDither = true;
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(path, options);
+    }
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
             }
         }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return ruta;
+
+        return inSampleSize;
     }
 
 }

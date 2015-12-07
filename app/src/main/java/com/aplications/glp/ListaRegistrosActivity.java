@@ -28,17 +28,6 @@ public class ListaRegistrosActivity extends AppCompatActivity {
         toolbar.setTitle("Lista de Registros");
         setSupportActionBar(toolbar);
 
-        /*
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        */
-
         FragmentManager fm = getSupportFragmentManager();
         fm.beginTransaction()
             .replace(R.id.frame_container,new ListaRegistrosActivityFragment(),ListaRegistrosActivityFragment.FRAGMENT_TAG)
@@ -55,5 +44,11 @@ public class ListaRegistrosActivity extends AppCompatActivity {
             intent.putExtra(REGISTRO_EXTRA,"null");
         setResult(Activity.RESULT_OK,intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        System.gc();
+        super.onDestroy();
     }
 }

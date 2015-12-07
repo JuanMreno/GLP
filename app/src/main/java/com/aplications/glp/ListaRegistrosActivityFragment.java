@@ -55,34 +55,10 @@ public class ListaRegistrosActivityFragment extends Fragment implements AdapterV
 
         Cursor cursor = sqlite.selectQuery("SELECT * FROM reportes");
 
-        Bitmap cilRec = null;
-        Bitmap cilEnt = null;
-
         registros = new ArrayList<>();
         if(cursor != null){
             if(cursor.moveToFirst()){
-                if(FileManager.isExternalStorageReadable()){
-                    Log.w(TAG,cursor.getString(10));
-
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inJustDecodeBounds = false;
-                    options.inPreferredConfig = Bitmap.Config.RGB_565;
-                    options.inDither = true;
-
-                    cilRec = BitmapFactory.decodeFile(cursor.getString(10),options);
-                    cilEnt = BitmapFactory.decodeFile(cursor.getString(12),options);
-                }
-
                 do{
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    cilRec.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                    byte[] b = baos.toByteArray();
-                    String cilRecEncoded = Base64.encodeToString(b, Base64.DEFAULT);
-
-                    cilEnt.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                    b = baos.toByteArray();
-                    String cilEntEncoded = Base64.encodeToString(b, Base64.DEFAULT);
-
                     registros.add(
                         new Registro(
                             cursor.getString(0),
@@ -95,9 +71,9 @@ public class ListaRegistrosActivityFragment extends Fragment implements AdapterV
                             cursor.getString(7),
                             cursor.getString(8),
                             cursor.getString(9),
-                            cilRecEncoded,
+                            cursor.getString(10),
                             cursor.getString(11),
-                            cilEntEncoded,
+                            cursor.getString(12),
                             cursor.getString(13),
                             cursor.getString(14),
                             cursor.getString(15),
@@ -120,6 +96,7 @@ public class ListaRegistrosActivityFragment extends Fragment implements AdapterV
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.w(TAG,"onItemClick Recarga N: " + registros.get(position).getRecargaN());
         ListaRegistrosActivity activity = (ListaRegistrosActivity) getActivity();
         activity.setResultNFinish(registros.get(position));
     }

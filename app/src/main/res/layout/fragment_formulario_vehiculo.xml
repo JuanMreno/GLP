@@ -42,9 +42,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/lblCilEntr"
+                    android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
                     android:id="@+id/imgEntregado"
-                    android:scaleType="fitXY"
                     android:onClick="eventoRegistrarFoto"
                     android:tag="ENTREGADO"
                     android:src="@drawable/photo"/>
@@ -71,9 +71,9 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
                     android:layout_below="@+id/lblCilRec"
-                    android:scaleType="fitXY"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
                     android:id="@+id/imgRecibido"
                     android:onClick="eventoRegistrarFoto"
                     android:tag="RECIBIDO"

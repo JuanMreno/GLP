@@ -265,6 +265,7 @@ public class FormularioFragmentPlataforma extends Fragment {
             }
         });
 
+        System.gc();
         return view;
     }
 
@@ -378,6 +379,7 @@ public class FormularioFragmentPlataforma extends Fragment {
             );
 
             ((PrincipalActivity)getActivity()).toastMensaje(getActivity().getString(R.string.txt_mns_reg_exito));
+
 
             FragmentManager fm = getActivity().getSupportFragmentManager();
             if(retomarDatos){
