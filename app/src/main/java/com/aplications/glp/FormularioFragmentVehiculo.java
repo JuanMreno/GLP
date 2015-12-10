@@ -152,7 +152,7 @@ public class FormularioFragmentVehiculo extends Fragment {
             editIdentificacionCliente.setText(identificacionParam);
             editDireccionCliente.setText(direccionParam);
             editTelefono.setText(telefonoParam);
-            editRecargaN.setText(recargaNParam);
+            //editRecargaN.setText(recargaNParam);
 
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.cap_cilindros_array, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

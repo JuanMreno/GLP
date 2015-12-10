@@ -1,6 +1,8 @@
 package com.aplications.glp;
 
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,9 +19,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.aplications.glp.objetos.Registro;
 import com.aplications.glp.objetos.SessionProfile;
@@ -33,6 +37,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.Calendar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -192,6 +197,56 @@ public class EditarFragmentPlataforma extends Fragment {
         };
 
         btnGuardar.setOnClickListener(onClickListener);
+
+        fecha.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    Calendar calendar = Calendar.getInstance();
+                    DatePickerDialog pickerDialog = new DatePickerDialog(
+                            getActivity(),
+                            new DatePickerDialog.OnDateSetListener() {
+                                @Override
+                                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                    fecha.setText(
+                                            String.valueOf(dayOfMonth) + "/" + String.valueOf(monthOfYear + 1) + "/" + String.valueOf(year));
+                                }
+                            },
+                            calendar.get(Calendar.YEAR),
+                            calendar.get(Calendar.MONTH),
+                            calendar.get(Calendar.DAY_OF_MONTH)
+                    );
+
+                    pickerDialog.setMessage("Fecha");
+                    pickerDialog.show();
+                }
+            }
+        });
+
+        hora.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    Calendar calendar = Calendar.getInstance();
+                    TimePickerDialog pickerDialog = new TimePickerDialog(
+                            getActivity(),
+                            new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                    hora.setText(String.valueOf(hourOfDay) + ":" + String.valueOf(minute));
+                                }
+                            },
+                            calendar.get(Calendar.HOUR),
+                            calendar.get(Calendar.MINUTE),
+                            true
+                    );
+
+                    pickerDialog.updateTime(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+                    pickerDialog.setMessage("Hora");
+                    pickerDialog.show();
+                }
+            }
+        });
 
         return view;
     }

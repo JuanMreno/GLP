@@ -196,6 +196,9 @@ public class PrincipalActivity extends AppCompatActivity implements
 
                 ImageView imageView;
 
+                SharedPreferencesManager sp = new SharedPreferencesManager(PrincipalActivity.this,SharedPreferencesManager.SESION_PROFILE);
+                session = sp.getSesionData();
+
                 if(tipoImgSelec.equals(RECIBIDO_TAG)){
                     setCrImgEditada(true);
                     imageView = (ImageView) findViewById(R.id.imgRecibido);
